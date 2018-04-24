@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -14,40 +14,38 @@ class Blog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
-    body = db.Column(db.String(Text))
+    body = db.Column(db.String(200))
 
-    def __init__(self, name):
+    def __init__(self, name, body):
         self.name = name
-        self.completed = False
+        self.body = body
 
 
-blogs = []
+@app.route('/new_post', methods=['GET', 'POST'])
+def new_post():
+    if request.method == 'GET':
+        return render_template('new_post.html', title="test")
+    if request.method == 'POST':
+        name = request.form['name']
+        body = request.form['body']
+        if name == '':
+            name_error = "Please enter a name for your blog"
+        if body == '':
+            body_error = "Please enter your blog"
+        if not name_error and not body_error:
+            blog = Blog(name, body)
+            db.session.add(blog)
+            db.session.commit()
+            return redirect('/', blog)
+        else:
+            return render_template('new_post.html', title="somethingnew", name_error=name_error, body_error=body_error)
+
 
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-
-    if request.method == 'POST':
-        blog_name = request.form['blog']
-        new_blog = Blog(blog_name)
-        db.session.add(new_blog)
-        db.session.commit()
-    
-    blogs = Blog.query.filter_by(completed=False).all()
-    completed_blogs = Blog.query.filter_by(completed=True).all()
-    return render_template('blogs.html', title="Build A Blog", blogs=blogs, completed_blogs=completed_blogs)
-
-
-@app.route('/delete-blog', methods=['POST'])
-def delete_task():
-
-    blog_id = int(request.form['blog-id'])
-    blog = Blog.query.get(blog_id)
-    blog.completed = True
-    db.session.add(blog)
-    db.session.commit()
-
-    return redirect('/')
+    all_blogs = Blog.query.all()
+    return render_template('blogs.html', title="Build A Blog", all_blogs=all_blogs)
 
 
 if __name__ =='__main__':
