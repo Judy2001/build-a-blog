@@ -23,23 +23,39 @@ class Blog(db.Model):
 
 @app.route('/new_post', methods=['GET', 'POST'])
 def new_post():
+    name_error = ''
+    body_error = ''
     if request.method == 'GET':
-        return render_template('new_post.html', title="test")
+        return render_template('new_post.html')
+    
     if request.method == 'POST':
         name = request.form['name']
         body = request.form['body']
+
         if name == '':
             name_error = "Please enter a name for your blog"
         if body == '':
             body_error = "Please enter your blog"
-        if not name_error and not body_error:
+
+        if name_error and body_error:
+            return render_template('new_post.html', name_error=name_error, body_error=body_error)
+        elif name_error:
+            return render_template('new_post.html', name_error=name_error, body=body)
+        elif body_error:
+            return render_template('new_post.html', name=name, body_error=body_error)
+        else:
             blog = Blog(name, body)
             db.session.add(blog)
             db.session.commit()
-            return redirect('/', blog)
-        else:
-            return render_template('new_post.html', title="somethingnew", name_error=name_error, body_error=body_error)
+            blog_query = "/blog?id=" + str(blog.id)
+            return redirect('/individual_blog?name=' + name + '&body' + body)
 
+
+@app.route('/individual_blog', methods=['GET'])
+def individual_blog():
+    name = request.args.get('blog.name')
+    body = request.args.get('blog.body')
+    return render_template('individual_blog.html', name=name, body=body)
 
 
 @app.route('/', methods=['POST', 'GET'])
