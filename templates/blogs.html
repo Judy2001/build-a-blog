@@ -7,14 +7,11 @@
     <p>No blogs yet</p>
 
     {% else %}
-        <ul>
-            {% for blog in all_blogs %}
-            <li><h2><a href="/individual_blog">{{blog.name}} </a></h2></li>
-            <li><h4>{{blog.body}}</h4></li>
-            <hr>
-            {% endfor %}
-        </ul>
-
+        {% for blog in all_blogs %}
+        <h2><a href="/individual_blog">{{blog.name}} </a></h2>
+        <h4>{{blog.body}}</h4>
+        <hr>
+        {% endfor %}
     {% endif %}
 
 {% endblock %}
