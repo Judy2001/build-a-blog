@@ -23,6 +23,8 @@ class Blog(db.Model):
 
 @app.route('/new_post', methods=['GET', 'POST'])
 def new_post():
+    name = ''
+    body = ''
     name_error = ''
     body_error = ''
     if request.method == 'GET':
@@ -31,7 +33,8 @@ def new_post():
     if request.method == 'POST':
         name = request.form['name']
         body = request.form['body']
-
+        print (name)
+        print (body)
         if name == '':
             name_error = "Please enter a name for your blog"
         if body == '':
@@ -39,23 +42,24 @@ def new_post():
 
         if name_error and body_error:
             return render_template('new_post.html', name_error=name_error, body_error=body_error)
-        elif name_error:
+        elif name_error and not body_error:
             return render_template('new_post.html', name_error=name_error, body=body)
-        elif body_error:
+        elif body_error and not name_error:
             return render_template('new_post.html', name=name, body_error=body_error)
         else:
             blog = Blog(name, body)
             db.session.add(blog)
             db.session.commit()
-            blog_query = "/blog?id=" + str(blog.id)
-            return redirect('/individual_blog?name=' + name + '&body=' + body)
+            blog_query = "/individual_blog?id=" + str(blog.id)
+            return redirect(blog_query)
 
 
 @app.route('/individual_blog', methods=['GET'])
 def individual_blog():
-    name = request.args.get('blog.name')
-    body = request.args.get('blog.body')
-    return render_template('individual_blog.html', name=name, body=body)
+    blog_id = request.args.get('id')
+    blog = Blog.query.filter_by(id=blog_id).first()
+    print(blog.name, blog.body)
+    return render_template('individual_blog.html', blog=blog)
 
 
 @app.route('/', methods=['POST', 'GET'])
