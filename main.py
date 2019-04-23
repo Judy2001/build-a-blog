@@ -33,8 +33,6 @@ def new_post():
     if request.method == 'POST':
         name = request.form['name']
         body = request.form['body']
-        print (name)
-        print (body)
         if name == '':
             name_error = "Please enter a name for your blog"
         if body == '':
