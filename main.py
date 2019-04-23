@@ -58,7 +58,6 @@ def new_post():
 def individual_blog():
     blog_id = request.args.get('id')
     blog = Blog.query.filter_by(id=blog_id).first()
-    print(blog.name, blog.body)
     return render_template('individual_blog.html', blog=blog)
 
 
@@ -68,5 +67,5 @@ def index():
     return render_template('blogs.html', title="Build A Blog", all_blogs=all_blogs)
 
 
-if __name__ =='__main__':
+if __name__ == "__main__":
     app.run()
