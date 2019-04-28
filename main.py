@@ -27,6 +27,7 @@ def new_post():
     body = ''
     name_error = ''
     body_error = ''
+
     if request.method == 'GET':
         return render_template('new_post.html')
     
@@ -48,8 +49,7 @@ def new_post():
             blog = Blog(name, body)
             db.session.add(blog)
             db.session.commit()
-            blog_query = "/individual_blog?id=" + str(blog.id)
-            return redirect(blog_query)
+            return redirect("/individual_blog?id=" + str(blog.id))
 
 
 @app.route('/individual_blog', methods=['GET'])
